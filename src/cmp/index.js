@@ -1,0 +1,1 @@
+export { default as Rangy } from './Rangy.svelte';

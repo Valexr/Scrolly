@@ -1,0 +1,1 @@
+export { default as Scrolly } from './Scrolly.svelte';

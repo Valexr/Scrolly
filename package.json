@@ -1,0 +1,43 @@
+{
+  "name": "svelte-scrolly",
+  "version": "0.1.1",
+  "description": "Starter for new Svelte application with ESBuild bundler ",
+  "main": "dist/scrolly.js",
+  "module": "dist/scrolly.esm.js",
+  "browser": "dist/scrolly.iife.js",
+  "svelte": "src/index.js",
+  "scripts": {
+    "build": "node esbuild",
+    "dev": "node esbuild --dev",
+    "dist": "node esbuild --dist",
+    "start": "npx derver --production --port=5000 public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Valexr/svelte-scrolly.git"
+  },
+  "keywords": [
+    "svelte",
+    "slider",
+    "carousel",
+    "component",
+    "derver",
+    "esbuild"
+  ],
+  "author": "Valexr",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Valexr/svelte-scrolly/issues"
+  },
+  "homepage": "https://github.com/Valexr/svelte-scrolly#readme",
+  "devDependencies": {
+    "derver": "^0.4.12",
+    "esbuild": "^0.8.34",
+    "esbuild-svelte": "^0.4.0",
+    "esbuild-svelte-paths": "^0.1.3",
+    "sass": "^1.32.5",
+    "seamless-scroll-polyfill": "^1.2.3",
+    "svelte": "^3.31.2",
+    "svelte-preprocess": "^4.6.3"
+  }
+}

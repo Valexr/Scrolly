@@ -4,9 +4,9 @@
         "paths": {
             "svelte-scrolly": [
                 "./src/scrolly/index.js"
-                // "../dist/slidy.esm.js"
-                // "../dist/slidy.iife.js"
-                // "../dist/slidy.js"
+                // "./dist/scrolly.esm.js"
+                // "./dist/scrolly.iife.js"
+                // "./dist/scrolly.js"
             ],
             "@cmp": [
                 "./src/cmp/index.js"

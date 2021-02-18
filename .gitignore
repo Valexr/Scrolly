@@ -6,3 +6,4 @@ src/tmp
 
 package-lock.json
 .npmignore
+.DS_store

@@ -5,12 +5,11 @@ const sveltePreprocess = require("svelte-preprocess");
 const pkg = require('./package.json');
 
 const DEV = process.argv.includes('--dev');
-const DIST = process.argv.includes('--dist');
 
 // Development server configuration. To configure production server
 // see `start` script in `package.json` file.
 
-const HOST = 'localhost';
+const HOST = '0.0.0.0';
 const PORT = 5000;
 
 async function build_client() {
@@ -31,7 +30,7 @@ async function build_client() {
                     css: false  //use `css:true` to inline CSS in `bundle.js`
                 },
 
-                preprocessor: [
+                preprocess: [
                     sveltePreprocess()
                 ]
 
@@ -40,23 +39,23 @@ async function build_client() {
     });
 }
 
-
 build_client().then(bundle => {
     DEV && derver({
         dir: 'public',
         host: HOST,
         port: PORT,
         watch: ['public', 'src'],
-        onwatch: async (lr, item) => {
-            if (item == 'src') {
-                lr.prevent();
-                bundle.rebuild().catch(err => lr.error(err.message, 'Svelte compile error'));
+        onwatch: async (l, i, file) => {
+            console.log(file)
+            if (i == 'src') {
+                l.prevent();
+                bundle.rebuild().catch(err => l.error(err.message, 'Svelte compile error'));
             }
         }
     })
 });
 
-DIST && (async () => {
+!DEV && (async () => {
 
     await build({
         entryPoints: ['src/scrolly/index.js'],
@@ -88,7 +87,7 @@ DIST && (async () => {
         bundle: true,
         minify: true,
         sourcemap: false,
-        globalName: "svelteScrolly",
+        globalName: "Scrolly",
         plugins: [sveltePlugin({ compileOptions: { css: true } })],
     });
 

@@ -1,18 +1,18 @@
 {
   "name": "svelte-scrolly",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "description": "Scrolly",
   "main": "dist/scrolly.js",
   "module": "dist/scrolly.esm.js",
   "browser": "dist/scrolly.iife.js",
-  "svelte": "src/index.js",
+  "svelte": "src/scrolly/index.js",
   "scripts": {
     "build": "node esbuild",
     "dev": "node esbuild --dev",
-    "dist": "node esbuild --dist",
     "start": "npx derver --production --port=5000 public",
     "predeploy": "node esbuild",
-    "deploy": "gh-pages -d public"
+    "deploy": "gh-pages -d public",
+    "prepublishOnly": "node esbuild"
   },
   "repository": {
     "type": "git",
@@ -34,13 +34,14 @@
   "homepage": "https://valexr.github.io/Scrolly/",
   "devDependencies": {
     "derver": "^0.4.12",
-    "esbuild": "^0.8.34",
+    "esbuild": "^0.8.39",
     "esbuild-svelte": "^0.4.0",
     "esbuild-svelte-paths": "^0.1.3",
     "gh-pages": "^3.1.0",
     "sass": "^1.32.5",
     "seamless-scroll-polyfill": "^1.2.3",
-    "svelte": "^3.31.2",
-    "svelte-preprocess": "^4.6.3"
+    "svelte": "^3.32.1",
+    "svelte-language-server": "^0.12.5",
+    "svelte-preprocess": "^4.6.5"
   }
 }

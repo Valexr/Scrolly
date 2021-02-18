@@ -4,19 +4,25 @@
         max = 100,
         step = 1,
         outputstyle = '',
-        id = '';
+        id = '',
+        thumbsize = 18,
+        output = false
 
-    async function onRangeInput() {
+    function onInput() {
+        output = true
         const newVal = Number(((value - min) * 100) / (max - min));
-        outputstyle = `left: calc(${newVal}% + (${18 - newVal * 0.36}px))`;
+        outputstyle = `left: calc(${newVal}% + (${thumbsize/2 - newVal * (thumbsize/100)}px))`;
     }
-    $: value, onRangeInput();
+    $: value && onInput();
+    $: value <= min ? (value = min) : value >= max ? (value = max) : (value = value);
 </script>
 
-<fieldset>
+<fieldset style="--thumbsize: {thumbsize}px">
     <label>
-        <output style={outputstyle}>{value}</output>
-        <input {id} type="range" {min} {max} {step} bind:value on:input={onRangeInput} />
+        <!-- {#if output} -->
+            <output style={outputstyle}>{value}</output>
+        <!-- {/if} -->
+        <input {id} type="range" {min} {max} {step} bind:value on:change={()=>output = false} on:input={onInput} />
     </label>
 </fieldset>
 
@@ -36,13 +42,26 @@
         position: relative;
     }
     output {
+        height: 25px;
+        line-height: 15px;
+        box-sizing: border-box;
         background: #171d23;
         color: white;
-        padding: 4px 12px;
+        padding: 5px 10px;
         position: absolute;
         border-radius: 4px;
         left: 50%;
-        top: 0;
+        top: calc((var(--thumbsize) / -2) - 5px);
+        transform: translateX(-50%);
+    }
+    output::after {
+        content: '';
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 5px solid #171d23;
+        bottom: -5px;
+        position: absolute;
+        left: 50%;
         transform: translateX(-50%);
     }
     input[type='range'] {
@@ -62,46 +81,43 @@
         overflow: visible;
     }
     input[type='range']::-moz-range-thumb {
-        background-color: #da5468;
+        background-color: #eb5757;
         box-sizing: border-box;
-        width: 27px;
-        height: 40px;
+        width: var(--thumbsize);
+        height: var(--thumbsize);
         border-radius: 100%;
         transform: translateX(calc(var(--value) - 50%));
         border: 0;
         position: relative;
         appearance: none;
-        width: 0;
-        /* height: 0; */
-        border-left: 18px solid transparent;
-        border-right: 18px solid transparent;
-        border-bottom: 18px solid #da5468;
-        background: transparent;
-        margin-bottom: -100px;
-        top: -10px;
+        /* border-left: 18px solid transparent; */
+        /* border-righ/t: 18px solid transparent; */
+        /* border-bottom: 18px solid #eb5757; */
+        /* background: transparent; */
     }
     input[type='range']::-webkit-slider-thumb {
-        background-color: #da5468;
+        background-color: #eb5757;
         box-sizing: border-box;
-        width: 27px;
-        height: 27px;
+        width: var(--thumbsize);
+        height: var(--thumbsize);
         border-radius: 100%;
         transform: translateX(calc(var(--value) - 50%));
         border: 0;
         position: relative;
         appearance: none;
-        width: 0;
-        /* height: 0; */
-        border-left: 18px solid transparent;
-        border-right: 18px solid transparent;
-        border-bottom: 18px solid #da5468;
-        background: transparent;
-        margin-bottom: -100px;
-        top: -10px;
+        /* border-left: 18px solid transparent; */
+        /* border-right: 18px solid transparent; */
+        /* border-bottom: 18px solid #eb5757; */
+        /* background: transparent; */
     }
     input[type='range']:focus::-moz-range-thumb,
     input[type='range']:focus::-webkit-slider-thumb {
-        background-color: transparent;
+        
+        /* background-color: transparent; */
+    }
+    input[type='range']:active::-moz-range-thumb,
+    input[type='range']:active::-webkit-slider-thumb {
+        /* --thumbsize: 27px */
     }
     input[type='range']::-moz-range-track,
     input[type='range']::-webkit-slider-runnable-track {

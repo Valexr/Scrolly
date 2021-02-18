@@ -1,125 +1,155 @@
 <script>
 	import { onMount, tick } from 'svelte/internal';
-	import { drag } from './drag.js';
-	import { resize } from './resize.js';
-	import { browser } from './browser.js';
-	import { intersection } from './intersection.js';
+	import * as action from './actions.js';
 	import { polyfill } from 'seamless-scroll-polyfill';
-	if (browser() === 'safari') polyfill();
+
+	const CHROME = navigator.userAgent.indexOf('Chrome') != -1;
+	const FIREFOX = navigator.userAgent.indexOf('Firefox') != -1;
+	const SAFARI = navigator.userAgent.indexOf('Safari') != -1;
+	SAFARI && polyfill();
 
 	export let items = [],
-		top = 0,
-		left = 0,
-		behavior = 'smooth',
 		index = 0,
-		width = 50,
-		scrollIntoViewOptions = {
+		init = false,
+		wrap = {
+			id: 'scrolly',
+			width: 100,
+			height: 100,
+		},
+		item = {
+			width: 50,
+			height: 100,
+			gap: 20,
+			backimg: true,
+			srckey: 'src',
+		},
+		controls = {
+			dotsout: false,
+		},
+		options = {
+			loop: false,
+			vertical: false,
+		};
+
+	$: init = items.length && nodes.length && items.length === nodes.length;
+	$: nodes = nodes.filter(Boolean);
+
+	// SCROLL ---------------------------------------------
+	let nodes = [],
+		scrollintoview = {
 			behavior: 'smooth',
 			block: 'center',
 			inline: 'center',
 		};
 
-	onMount(() => {
-		items.length && (index = 7);
-		// behavior = 'smooth';
-		browser();
-		dots = nodes;
-	});
-
 	function scrollIndex(i) {
-		nodes.length && nodes[i].scrollIntoView(scrollIntoViewOptions);
-		// iscroll = true;
+		if (i < 0) {
+			index = i = 0;
+		} else if (i > nodes.length - 1) {
+			index = i = nodes.length - 1;
+		}
+		init && nodes[i].scrollIntoView(scrollintoview);
 	}
-	$: scrollIndex(index);
+	$: init && scrollIndex(index);
 
-	let wrap,
-		ul,
-		nodes = [],
-		dots = [],
-		x = 0,
-		ssalign = 'center',
-		sstype = 'both mandatory',
+	let isScroll = false,
+		spos = 0,
 		timer = null,
-		isdrag = false,
+		ssalign = 'center',
+		sstype = 'both mandatory';
+
+	function onScroll(e) {
+		isScroll = true;
+		spos = options.vertical ? e.target.scrollTop : e.target.scrollLeft
+		// action.direct(spos)
+		// action.direct === 'stop' && console.log('directSTOP ||')
+		timer !== null && clearTimeout(timer);
+		timer = setTimeout(() => {
+			isScroll = false;
+			// FIREFOX || CHROME && !isDrag && (sstype = 'both mandatory', behavior = 'smooth');
+		}, 60);
+	}
+
+	let ul = null,
+		behavior = 'smooth';
+
+	$: ul &&
+		nodes.length &&
+		ul.scroll({
+			top: pos,
+			left: pos,
+			behavior: behavior,
+		});
+
+	// DIRECTION -------------------------------------------------
+	// let p = 0,
+	// 	direction = {
+	// 		next: false,
+	// 		prev: false,
+	// 		stop: false,
+	// 	};
+	// function directionState() {
+	// 	if (x === p) {
+	// 		direction.stop = true;
+	// 		return;
+	// 	} else if (x >= p) {
+	// 		direction.next = true;
+	// 	} else if (x <= p) {
+	// 		direction.prev = true;
+	// 	}
+	// 	p = x;
+	// }
+
+	// DRAG ------------------------------------------------------
+	let isDrag = false,
 		tracker = null,
 		htx = 0,
 		speed = 0,
-		isscroll = false;
-
-	function onScroll(e) {
-		directionState();
-		x = e.target.scrollLeft;
-		if (timer !== null) {
-			clearTimeout(timer);
-		}
-		timer = setTimeout(() => {
-			// console.log('scrollStop');
-			// left = x;
-			// isscroll = false;
-		}, 100);
-	}
-
-	async function scrollto(top, left, behavior) {
-		ul &&
-			ul.scrollTo({
-				top: top,
-				left: left,
-				behavior: behavior,
-			});
-		// console.log('scrollto');
-	}
-	$: scrollto(top, left, behavior);
-
-	let p = 0,
-		direction = {
-			next: false,
-			prev: false,
-			stop: false,
-		};
-	function directionState() {
-		if (x === p) {
-			direction.stop = true;
-			console.log('| stop |');
-			return;
-		} else if (x >= p) {
-			direction.next = true;
-			console.log('next >>');
-		} else if (x <= p) {
-			direction.prev = true;
-			console.log('<< prev');
-		}
-		p = x;
-	}
+		pos = 0
 
 	function dragStart() {
-		isdrag = true;
-		left = x;
+		isDrag = true;
 		behavior = 'auto';
-		sstype = null;
-		// browser() === 'firefox' || browser() === 'chrome' ? (sstype = null) : null;
+		pos = spos;
+		speed = 0;
+		FIREFOX || CHROME && (sstype = 'none');
 	}
-
 	function dragMove(e) {
-		left -= e.detail.dx * 1.6;
-		tracker = setInterval(() => (htx = left), 60);
-		speed = (x - left) / 60;
+		let dd = options.vertical ? Math.floor(e.detail.dy) : Math.floor(e.detail.dx);
+		pos -= dd * 1.6
+		tracker = setInterval(() => (htx = pos), 60);
+		speed = (htx - pos) / 60
 	}
 
 	function dragEnd() {
-		clearInterval(tracker);
-		left -= x * (speed / 6);
+		isDrag = false;
 		behavior = 'smooth';
+		pos -= (pos * speed) / 1.6
 		speed = 0;
-		tick().then(() => {
-			// top = 0;
-			// left += x * direction.prev ? -speed : speed;
-			// direction.stop && (sstype = 'both mandatory');
-			// clearInterval(tracker);
-			// speed = 0;
-			// left = x;
-		});
+		clearInterval(tracker);
+	}
+	$: console.log(spos, pos)
+
+	// WHEEL -----------------------------------------------
+	function onWheel(e) {
+		// let dw = options.vertical ? Math.floor(-e.detail.dy): Math.floor(-e.detail.dx);
+		// pos = spos
+		// pos -= -e.detail.dx * 1.6
+		// console.log('dw:', dw)
 	}
 
+	// KEYS -------------------------------------------------------
+	function onKeydown(e) {
+		if (e.keyCode === 37 || e.keyCode === 38) {
+			e.preventDefault()
+			index--;
+		} else if (e.keyCode === 39 || e.keyCode === 40) {
+			e.preventDefault()
+			index++;
+		}
+	}
+
+	// RESIZE ------------------------------------------------------
 	let wrapwidth, wrapheight;
 	function resizeWrap(e) {
 		wrapwidth = e.detail.CR.width;
@@ -127,13 +157,14 @@
 		scrollIndex(index);
 	}
 
-	let intersected = [],
+	// INTERSECTION ------------------------------------------------
+	let section = null,
+		intersected = [],
 		intoptions = {
-			root: null,
+			root: section,
 			rootMargin: '0px',
 			threshold: 1.0,
-		},
-		intinit = true;
+		};
 	function onIntersection(e, i) {
 		for (const entry of e.detail.entries) {
 			if (entry.isIntersecting) {
@@ -144,106 +175,120 @@
 			}
 		}
 	}
-
-	// $: console.log(left, x, ssalign, browser(), speed, index);
-	// $: console.log(nodes, dots);
 </script>
 
-<!-- <svelte:window on:scroll|preventDefault /> -->
 <section
-	style="--ssalign: {ssalign}; --sstype: {sstype}; --ligap: 20px"
-	bind:this={wrap}
-	use:resize
+	id={wrap.id}
+	bind:this={section}
+	class:vertical={options.vertical}
+	class:dotsout={controls.dotsout}
+	style="
+		--ssalign: {ssalign};
+		--sstype: {sstype};
+		--ww: {wrap.width}%;
+		--wh: {wrap.height}%;
+		--liw: {item.width}%;
+		--lih: {item.height}%;
+		--lig: {item.gap}px;
+		--lim: {options.vertical ? 'var(--lig) 0 0 0' : '0 0 0 var(--lig)'};
+	"
+	use:action.resize
 	on:resize={resizeWrap}
 >
 	<ul
-		class="gallery"
+		tabindex="0"
 		bind:this={ul}
+		class="gallery"
 		on:scroll={onScroll}
-		use:drag
+		on:keydown={onKeydown}
+		on:click={ul.focus()}
+		use:action.drag
 		on:dragstart={dragStart}
 		on:dragmove={dragMove}
 		on:dragend={dragEnd}
+		use:action.wheel
+		on:wheels={onWheel}
 	>
-		{#if items}
-			{#each items as item, i}
+		{#if items.length}
+			{#each items as itm, i}
 				<li
 					bind:this={nodes[i]}
-					use:intersection={{ ...intoptions }}
+					use:action.intersection={intoptions}
 					on:intersection={(e) => onIntersection(e, i)}
 					class:active={i === index}
-					style="background-image: url({item.src}); --width: {width}%"
+					style={item.backimg === true
+						? `background-image: url(${itm[item.srckey]})`
+						: null}
 				>
 					<b>{i}</b>
-					<!-- <img alt={item.id} src={item.src} /> -->
-					<!-- use:intersection={{ ...intoptions }}
-					on:intersection={(e) => onIntersection(e, i)} -->
+					{#if item.backimg === false}
+						<img alt={itm.id} src={itm.src} />
+					{/if}
 				</li>
 			{/each}
 			<li>&nbsp;</li>
 		{/if}
 	</ul>
-</section>
-<nav>
 	<ul class="dots">
-		{#each dots as dot, i}
+		{#each nodes as dot, i}
 			<li class:active={i === index}>
-				<button on:click={() => (index = i)}>
+				<button on:click|stopPropagation={() => (index = i)}>
 					{i}
 				</button>
 			</li>
 		{/each}
 	</ul>
-</nav>
+</section>
 
 <style>
-	:global(body) {
-		overflow: hidden;
-	}
 	section {
-		width: 100%;
-		height: 50%;
-		margin: var(--ligap) 0;
+		width: var(--ww);
+		height: var(--wh);
 		box-sizing: border-box;
+		position: relative;
+		display: flex;
+		justify-content: center;
+		align-items: center;
 	}
 	ul {
-		height: 100%;
 		margin: 0;
-		padding: 0 var(--ligap);
+		padding: 0 var(--lig);
 		display: flex;
-		width: 100%;
 		user-select: none;
 		-webkit-user-select: none;
 		list-style: none;
 		box-sizing: border-box;
 	}
 	ul > * + * {
-		margin: 0 0 0 var(--ligap);
+		margin: var(--lim);
 	}
 	ul.gallery {
+		width: 100%;
+		height: 100%;
+		outline: none;
 		overscroll-behavior: auto;
 		overflow-x: scroll;
 		scroll-behavior: auto;
-		scroll-padding: 0 var(--ligap);
+		scroll-padding: 0 var(--lig);
 		scroll-snap-stop: always;
 		scroll-snap-type: var(--sstype);
 		-webkit-overflow-scrolling: touch;
 		-ms-overflow-style: none;
 		scrollbar-width: none;
-		/* transform: translateZ(-1px); */
 	}
 	ul.gallery::-webkit-scrollbar {
 		display: none;
 	}
-	ul.gallery li:last-child {
-		flex: 1 0 auto;
-		margin: 0 0 0 calc(var(--ligap) - 4px);
-		overflow: visible;
-		opacity: 0;
-		box-sizing: content-box;
+	.dotsout ul.gallery {
+		height: calc(100% - 50px);
+	}
+	.vertical ul.gallery {
+		flex-direction: column;
 	}
 	ul.gallery li {
-		flex: 1 0 var(--width);
+		flex: 1 0 var(--liw);
+		width: var(--liw);
+		height: var(--lih);
 		max-width: 100%;
 		position: relative;
 		background-color: hsla(0, 0%, 0%, 0.081);
@@ -251,11 +296,16 @@
 		background-position: center;
 		background-repeat: no-repeat;
 		scroll-snap-align: var(--ssalign);
-		box-sizing: content-box;
+		box-sizing: border-box;
 		border-radius: 1rem;
 		overflow: hidden;
-		/* transform: translateZ(-1px); */
-		/* will-change: auto; */
+	}
+	ul.gallery li:last-child {
+		flex: 1 0 var(--lig);
+		margin: 0;
+		opacity: 0;
+		overflow: visible;
+		box-sizing: content-box;
 	}
 	ul.gallery li b {
 		position: absolute;
@@ -264,29 +314,31 @@
 		background-color: rgb(23, 29, 35);
 		border-bottom-right-radius: 1rem;
 	}
-	/* ul.gallery li img {
+	ul.gallery li img {
 		object-fit: cover;
 		max-width: 100%;
 		height: 100%;
 		width: 100%;
-	} */
+	}
 	ul.gallery li.active {
 		color: rgb(218, 84, 104);
 	}
-	nav {
+	/* nav {
 		overflow-x: scroll;
 		text-align: center;
 		scrollbar-width: none;
-	}
+	} */
 	ul.dots {
-		width: auto;
+		width: 100%;
 		height: 50px;
 		display: inline-flex;
 		align-items: center;
+		justify-content: center;
+		position: absolute;
+		bottom: 0;
 	}
 	ul.dots li {
 		margin: 0 5px;
-		/* display: inline-block; */
 	}
 	ul.dots li button {
 		color: rgb(235, 191, 131);
@@ -300,9 +352,9 @@
 		height: 27px;
 	}
 	ul.dots li button:active {
-		color: rgb(218, 84, 104);
+		color: #eb5757;
 	}
 	ul.dots li.active button {
-		color: rgb(218, 84, 104);
+		color: #eb5757;
 	}
 </style>

@@ -1,4 +1,4 @@
-[
+export default [
 	{
 		"id": 1,
 		"src": "https://picsum.photos/900/900.jpg?random=1"
@@ -34,29 +34,5 @@
 	{
 		"id": 9,
 		"src": "https://picsum.photos/3000/900.jpg?random=9"
-	},
-	{
-		"id": 10,
-		"src": "https://picsum.photos/900/900.jpg?random=10"
-	},
-	{
-		"id": 11,
-		"src": "https://picsum.photos/1240/900.jpg?random=11"
-	},
-	{
-		"id": 12,
-		"src": "https://picsum.photos/1800/900.jpg?random=12"
-	},
-	{
-		"id": 13,
-		"src": "https://picsum.photos/1540/900.jpg?random=13"
-	},
-	{
-		"id": 14,
-		"src": "https://picsum.photos/540/900.jpg?random=14"
-	},
-	{
-		"id": 15,
-		"src": "https://picsum.photos/1140/900.jpg?random=15"
 	}
 ]

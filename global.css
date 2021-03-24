@@ -1,9 +1,9 @@
 :root {
 	--color-red_light: #e27e8d;
-	--color-red: #da5468;
+	--color-red: #EB5757;
 	--color-yellow: #ebbf83;
-	--color-blue: #69a1f0;
-	--color-blue_light: #5cbff9;
+	--color-blue: #2D9CDB;
+	--color-blue_light: #56CCF2;
 	--color-green_light: #70e1e8;
 	--color-green: #81c591;
 	--color-gray: #6f889d;
@@ -24,6 +24,7 @@ body {
 	padding: 0;
 	box-sizing: border-box;
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+	overflow: hidden;
 }
 
 a {

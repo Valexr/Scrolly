@@ -5,7 +5,7 @@
     "main": "dist/scrolly.js",
     "module": "dist/scrolly.esm.js",
     "browser": "dist/scrolly.iife.js",
-    "svelte": "src/scrolly/index.js",
+    "svelte": "src/index.js",
     "scripts": {
         "build": "node esbuild",
         "dev": "node esbuild --dev",

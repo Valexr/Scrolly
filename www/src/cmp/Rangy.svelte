@@ -6,12 +6,12 @@
         outputstyle = '',
         id = '',
         thumbsize = 18,
-        output = false
+        output = false;
 
     function onInput() {
-        output = true
+        output = true;
         const newVal = Number(((value - min) * 100) / (max - min));
-        outputstyle = `left: calc(${newVal}% + (${thumbsize/2 - newVal * (thumbsize/100)}px))`;
+        outputstyle = `left: calc(${newVal}% + (${thumbsize / 2 - newVal * (thumbsize / 100)}px))`;
     }
     $: value && onInput();
     $: value <= min ? (value = min) : value >= max ? (value = max) : (value = value);
@@ -20,9 +20,18 @@
 <fieldset style="--thumbsize: {thumbsize}px">
     <label>
         <!-- {#if output} -->
-            <output style={outputstyle}>{value}</output>
+        <output style={outputstyle}>{value}</output>
         <!-- {/if} -->
-        <input {id} type="range" {min} {max} {step} bind:value on:change={()=>output = false} on:input={onInput} />
+        <input
+            {id}
+            type="range"
+            {min}
+            {max}
+            {step}
+            bind:value
+            on:change={() => (output = false)}
+            on:input={onInput}
+        />
     </label>
 </fieldset>
 
@@ -110,15 +119,15 @@
         /* border-bottom: 18px solid #eb5757; */
         /* background: transparent; */
     }
-    input[type='range']:focus::-moz-range-thumb,
+    /* input[type='range']:focus::-moz-range-thumb,
     input[type='range']:focus::-webkit-slider-thumb {
         
-        /* background-color: transparent; */
+        background-color: transparent;
     }
     input[type='range']:active::-moz-range-thumb,
     input[type='range']:active::-webkit-slider-thumb {
-        /* --thumbsize: 27px */
-    }
+        --thumbsize: 27px
+    } */
     input[type='range']::-moz-range-track,
     input[type='range']::-webkit-slider-runnable-track {
         background: transparent;

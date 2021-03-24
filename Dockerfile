@@ -1,6 +1,6 @@
 FROM node:15-alpine
 
-COPY ./public /app
+COPY ./www/public /app
 WORKDIR /app
 RUN npm install -g derver
 

@@ -1,18 +1,18 @@
 {
-    "baseUrl": ".",
     "compilerOptions": {
+        "baseUrl": ".",
         "paths": {
             "svelte-scrolly": [
-                "./src/scrolly/index.js"
+                "src/index.js"
                 // "./dist/scrolly.esm.js"
                 // "./dist/scrolly.iife.js"
                 // "./dist/scrolly.js"
             ],
             "@cmp": [
-                "./src/cmp/index.js"
+                "www/src/cmp/index.js"
             ],
             "@api/*": [
-                "./src/api/*"
+                "www/src/api/*"
             ]
             // "@act": [
             //     "./src/act/index.js"

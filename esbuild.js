@@ -14,26 +14,24 @@ const PORT = 5000;
 
 async function build_client() {
     return await build({
-        entryPoints: ['src/main.js'],
+        entryPoints: ['www/src/main.js'],
         bundle: true,
-        outfile: 'public/build/bundle.js',
+        outfile: 'www/public/build/bundle.js',
         mainFields: ['svelte', 'module', 'main'],
         minify: !DEV,
         incremental: DEV,
+        // target: 'es5',
         sourcemap: DEV && 'inline',
         plugins: [
             sveltePlugin({
-
                 compileOptions: {
                     // Svelte compile options
                     dev: DEV,
                     css: false  //use `css:true` to inline CSS in `bundle.js`
                 },
-
                 preprocess: [
                     sveltePreprocess()
                 ]
-
             })
         ]
     });
@@ -41,13 +39,13 @@ async function build_client() {
 
 build_client().then(bundle => {
     DEV && derver({
-        dir: 'public',
+        dir: 'www/public',
         host: HOST,
         port: PORT,
-        watch: ['public', 'src'],
+        watch: ['www/public', 'www/src', 'src'],
         onwatch: async (l, i, file) => {
             console.log(file)
-            if (i == 'src') {
+            if (i == 'src' || i == 'www/src') {
                 l.prevent();
                 bundle.rebuild().catch(err => l.error(err.message, 'Svelte compile error'));
             }
@@ -58,7 +56,7 @@ build_client().then(bundle => {
 !DEV && (async () => {
 
     await build({
-        entryPoints: ['src/scrolly/index.js'],
+        entryPoints: ['src/index.js'],
         outfile: pkg.main,
         format: 'cjs',
         bundle: true,
@@ -69,7 +67,7 @@ build_client().then(bundle => {
     });
 
     await build({
-        entryPoints: ['src/scrolly/index.js'],
+        entryPoints: ['src/index.js'],
         outfile: pkg.module,
         format: "esm",
         bundle: true,
@@ -80,7 +78,7 @@ build_client().then(bundle => {
     });
 
     await build({
-        entryPoints: ['src/scrolly/index.js'],
+        entryPoints: ['src/index.js'],
         outfile: pkg.browser,
         platform: 'browser',
         format: "iife",

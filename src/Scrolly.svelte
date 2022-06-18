@@ -1,3 +1,67 @@
+<section
+	id={wrap.id}
+	bind:this={section}
+	class:vertical={options.vertical}
+	class:dotsout={controls.dotsout}
+	style="
+		--ssalign: {ssalign};
+		--sstype: {sstype};
+		--ww: {wrap.width}%;
+		--wh: {wrap.height}%;
+		--liw: {item.width}%;
+		--lih: {item.height}%;
+		--lig: {item.gap}px;
+		--lim: {options.vertical ? 'var(--lig) 0 0 0' : '0 0 0 var(--lig)'};
+	"
+	use:resize
+	on:resize={resizeWrap}
+>
+	<ul
+		id="ul"
+		tabindex="0"
+		bind:this={ul}
+		class="gallery"
+		on:scroll={onScroll}
+		on:keydown={onKeydown}
+		on:click={ul.focus()}
+		use:drag
+		on:dragstart={dragStart}
+		on:dragmove={dragMove}
+		on:dragend={dragEnd}
+		use:wheel
+		on:wheels={onWheel}
+	>
+		{#if items.length}
+			{#each items as itm, i}
+				<li
+					bind:this={nodes[i]}
+					use:intersection={intoptions}
+					on:intersection={(e) => onIntersection(e, i)}
+					class:active={i === index}
+					id={`li${i}`}
+					tabindex="-1"
+					style={item.backimg === true ? `background-image: url(${itm[item.srckey]})` : null}
+				>
+					<b>{i}</b>
+					{#if item.backimg === false}
+						<img alt={itm.id} src={itm.src} />
+					{/if}
+				</li>
+			{/each}
+			<li>&nbsp;</li>
+		{/if}
+	</ul>
+	<ul class="dots">
+		{#each nodes as dot, i}
+			<li class:active={i === index}>
+				<button on:click|stopPropagation={() => (index = i)}>
+					{i}
+				</button>
+			</li>
+		{/each}
+	</ul>
+</section>
+
 <script>
 	import { onMount, tick } from 'svelte/internal';
 	import { resize, drag, wheel, intersection } from './actions.js';
@@ -7,7 +71,7 @@
 	const CHROME = navigator.userAgent.indexOf('Chrome') != -1;
 	const FIREFOX = navigator.userAgent.indexOf('Firefox') != -1;
 	const SAFARI = navigator.userAgent.indexOf('Safari') != -1;
-	// SAFARI && polyfill();
+	// onMount(() => SAFARI && tick().then(() => polyfill()));
 	// SAFARI && smoothscroll.polyfill();
 
 	export let items = [],
@@ -36,7 +100,7 @@
 	$: init = items.length && nodes.length && items.length === nodes.length;
 	$: nodes = nodes.filter(Boolean);
 
-	$: console.log(nodes)
+	$: console.log(nodes);
 
 	// SCROLL ---------------------------------------------
 	let nodes = [],
@@ -47,7 +111,7 @@
 		};
 
 	function scrollIndex(i) {
-		SAFARI && polyfill();
+		SAFARI && (ul?.focus(), polyfill());
 		if (i < 0) {
 			index = i = 0;
 		} else if (i > nodes.length - 1) {
@@ -184,70 +248,6 @@
 	}
 </script>
 
-<section
-	id={wrap.id}
-	bind:this={section}
-	class:vertical={options.vertical}
-	class:dotsout={controls.dotsout}
-	style="
-		--ssalign: {ssalign};
-		--sstype: {sstype};
-		--ww: {wrap.width}%;
-		--wh: {wrap.height}%;
-		--liw: {item.width}%;
-		--lih: {item.height}%;
-		--lig: {item.gap}px;
-		--lim: {options.vertical ? 'var(--lig) 0 0 0' : '0 0 0 var(--lig)'};
-	"
-	use:resize
-	on:resize={resizeWrap}
->
-	<ul
-		id="ul"
-		tabindex="0"
-		bind:this={ul}
-		class="gallery"
-		on:scroll={onScroll}
-		on:keydown={onKeydown}
-		on:click={ul.focus()}
-		use:drag
-		on:dragstart={dragStart}
-		on:dragmove={dragMove}
-		on:dragend={dragEnd}
-		use:wheel
-		on:wheels={onWheel}
-	>
-		{#if items.length}
-			{#each items as itm, i}
-				<li
-					bind:this={nodes[i]}
-					use:intersection={intoptions}
-					on:intersection={(e) => onIntersection(e, i)}
-					class:active={i === index}
-					id={`li${i}`}
-					tabindex="-1"
-					style={item.backimg === true ? `background-image: url(${itm[item.srckey]})` : null}
-				>
-					<b>{i}</b>
-					{#if item.backimg === false}
-						<img alt={itm.id} src={itm.src} />
-					{/if}
-				</li>
-			{/each}
-			<li>&nbsp;</li>
-		{/if}
-	</ul>
-	<ul class="dots">
-		{#each nodes as dot, i}
-			<li class:active={i === index}>
-				<button on:click|stopPropagation={() => (index = i)}>
-					{i}
-				</button>
-			</li>
-		{/each}
-	</ul>
-</section>
-
 <style>
 	section {
 		width: var(--ww);
@@ -283,6 +283,7 @@
 		-webkit-overflow-scrolling: touch;
 		-ms-overflow-style: none;
 		scrollbar-width: none;
+		pointer-events: all;
 	}
 	ul.gallery::-webkit-scrollbar {
 		display: none;

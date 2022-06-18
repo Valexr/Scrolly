@@ -1,3 +1,23 @@
+<h1>Scrolly[<b>{index}</b>]</h1>
+<nav id="top">
+    <button on:click={() => index--}>←</button>
+    <button on:click={() => (index = 4)}>[4]</button>
+    <button on:click={() => index++}>→</button>
+    <button on:click={() => (scrolly.options.vertical = !scrolly.options.vertical)}>{scrolly.options.vertical ? '↕' : '↔'}</button>
+    <button on:click={() => limit--}>-</button>
+    <button on:click={() => (page = randomQ(0, 90))}>reload</button>
+    <button on:click={() => limit++}>+</button>
+</nav>
+
+<div id="scrolly">
+    <Scrolly {...scrolly} bind:index bind:init {items} />
+</div>
+
+<nav id="bottom">
+    <Rangy min="0" max={items.length - 1} step="1" bind:value={index} />
+    <Rangy min="10" max="100" step="5" bind:value={scrolly.item.width} />
+</nav>
+
 <script>
     import { onMount, afterUpdate, tick, bind } from 'svelte/internal';
     import slides from './api/items.js';
@@ -39,28 +59,6 @@
     $: init && (index = 4);
     $: console.log(index, init);
 </script>
-
-<h1>Scrolly[<b>{index}</b>]</h1>
-<nav id="top">
-    <button on:click={() => index--}>←</button>
-    <button on:click={() => (index = 4)}>[4]</button>
-    <button on:click={() => index++}>→</button>
-    <button on:click={() => (scrolly.options.vertical = !scrolly.options.vertical)}
-        >{scrolly.options.vertical ? '↕' : '↔'}</button
-    >
-    <button on:click={() => limit--}>-</button>
-    <button on:click={() => (page = randomQ(0, 90))}>reload</button>
-    <button on:click={() => limit++}>+</button>
-</nav>
-
-<div id="scrolly">
-    <Scrolly {...scrolly} bind:index bind:init {items} />
-</div>
-
-<nav id="bottom">
-    <Rangy min="0" max={items.length - 1} step="1" bind:value={index} />
-    <Rangy min="10" max="100" step="5" bind:value={scrolly.item.width} />
-</nav>
 
 <style lang="scss">
     h1 {
